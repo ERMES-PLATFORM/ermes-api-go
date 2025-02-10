@@ -69,6 +69,18 @@ func CheckNode(node Node) error {
 	return nil
 }
 
+// UnmarshalNode unmarshals the node.
+func UnmarshalNode(data []byte) (*Node, error) {
+	var r Node
+	err := json.Unmarshal(data, &r)
+
+	if err == nil {
+		err = CheckNode(r)
+	}
+
+	return &r, err
+}
+
 // MarshalNode marshals the node.
 func MarshalNode(node Node) ([]byte, error) {
 	err := CheckNode(node)
