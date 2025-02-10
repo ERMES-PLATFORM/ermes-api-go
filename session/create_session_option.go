@@ -15,6 +15,10 @@ type CreateSessionOptions struct {
 	// The expiration time is expressed as a Unix timestamp (UTC). If the
 	// expiration time is nil, the session does not expire. Default is nil.
 	expiresAt *int64
+	// storage resources consumed by the session
+	storageResources *infrastructure.Resources
+	// computational resources consumed by the session
+	computationalResources *infrastructure.Resources
 	// Optional session ID. If nil, a new session ID is generated. Default is nil.
 	sessionId *string
 }
@@ -33,6 +37,16 @@ func (o CreateSessionOptions) ClientGeoCoordinates() *infrastructure.GeoCoordina
 // Get the expiration time.
 func (o CreateSessionOptions) ExpiresAt() *int64 {
 	return o.expiresAt
+}
+
+// Get the storage resources.
+func (o CreateSessionOptions) StorageResources() *infrastructure.Resources {
+	return o.storageResources
+}
+
+// Get the computational resources.
+func (o CreateSessionOptions) ComputationalResources() *infrastructure.Resources {
+	return o.computationalResources
 }
 
 // Get the session ID.
@@ -64,6 +78,18 @@ func (builder *CreateSessionOptionsBuilder) ExpiresAt(expiresAt time.Time) *Crea
 func (builder *CreateSessionOptionsBuilder) Expires(expiresIn time.Duration) *CreateSessionOptionsBuilder {
 	expiresAtUnix := time.Now().Add(expiresIn).Unix()
 	builder.options.expiresAt = &expiresAtUnix
+	return builder
+}
+
+// Set the storage consumed resources.
+func (builder *CreateSessionOptionsBuilder) StorageResources(storageResources infrastructure.Resources) *CreateSessionOptionsBuilder {
+	builder.options.storageResources = &storageResources
+	return builder
+}
+
+// Set the computational consumed resources.
+func (builder *CreateSessionOptionsBuilder) ComputationalResources(computationalResources infrastructure.Resources) *CreateSessionOptionsBuilder {
+	builder.options.computationalResources = &computationalResources
 	return builder
 }
 
