@@ -2,8 +2,6 @@ package session
 
 import (
 	"context"
-
-	"github.com/ERMES-PLATFORM/api-ermes-go/infrastructure"
 )
 
 // Commands to create a new session.
@@ -21,15 +19,31 @@ type CreateSessionCommands interface {
 	) (ids []string, newCursor uint64, err error)
 }
 
-// Options that defines how a session is created.
-type CreateSessionOptions struct {
-	// The geographic coordinates associated with the client that owns the session.
-	// If nil, the client sessionLocation is initially approximated to the sessionLocation of
-	// the node that creates the session. Default is nil.
-	clientGeoCoordinates *infrastructure.GeoCoordinates
-	// The expiration time is expressed as a Unix timestamp (UTC). If the
-	// expiration time is nil, the session does not expire. Default is nil.
-	expiresAt *int64
-	// Optional session ID. If nil, a new session ID is generated. Default is nil.
-	sessionId *string
+// Create a new session, the options to define how the session is created. If no
+// error is returned, a new session token is returned.
+func (n *Node) CreateSession(
+	ctx context.Context,
+	opt CreateSessionOptions,
+) (SessionToken, error) {
+	sessionId, err := n.Cmd.CreateSession(ctx, opt)
+
+	// If there is an error, return it.
+	if err != nil {
+		return SessionToken{}, err
+	}
+
+	// Create a new session token.
+	sessionToken := NewSessionToken(sessionId, n.Host)
+
+	// Return the session token.
+	return sessionToken, nil
+}
+
+// Returns the ids of the sessions.
+func (n *Node) ScanSessions(
+	ctx context.Context,
+	cursor uint64,
+	count int64,
+) (ids []string, newCursor uint64, err error) {
+	return n.Cmd.ScanSessions(ctx, cursor, count)
 }
